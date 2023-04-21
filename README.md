@@ -3,7 +3,7 @@
 ### Use 
 
 ```shell
-helm repo add kubernetes-dashboard https://helm.nekoimi.com
+helm repo add nekoimi-helm https://helm.nekoimi.com
 ```
 
 ### Installing the Chart
