@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "backup-database-data.fullname" . }}
+spec:
+  schedule: {{ .Values.schedule.cron | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          # image拉取凭证
+          imagePullSecrets:
+            - name: harbor-secret
+          containers:
+            - name: {{ include "backup-database-data.fullname" . }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: IfNotPresent
+              {{- with .Values.configMap.env }}
+              env:
+                {{- range $k, $v := . }}
+                - name: {{ $k }}
+                  value: {{ $v | quote }}
+                {{- end }}
+              {{- end }}
+              volumeMounts:
+                - mountPath: /opt/backup
+                  name: backup-data
+          restartPolicy: OnFailure
+          volumes:
+            - name: backup-data
+              persistentVolumeClaim:
+                claimName: {{ include "backup-database-data.fullname" . }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 8 }}
+          {{- end }}

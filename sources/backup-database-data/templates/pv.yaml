@@ -1,0 +1,19 @@
+{{- $storageVc := .Values.vc -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "backup-database-data.fullname" . }}
+  labels:
+    app: {{ include "backup-database-data.fullname" . }}
+    {{- include "backup-database-data.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ include "backup-database-data.fullname" . }}
+  capacity:
+    storage: {{ $storageVc.storage.size | quote }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: {{ $storageVc.nfs.host | quote }}
+    path: {{ $storageVc.nfs.mountPath | quote }}
+  persistentVolumeReclaimPolicy: Retain

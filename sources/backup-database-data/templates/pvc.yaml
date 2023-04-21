@@ -1,0 +1,17 @@
+{{- $storageVc := .Values.vc -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "backup-database-data.fullname" . }}
+  labels:
+    {{- include "backup-database-data.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ $storageVc.storage.size | quote }}
+  storageClassName: {{ include "backup-database-data.fullname" . }}
+  selector:
+    matchLabels:
+      app: {{ include "backup-database-data.fullname" . }}
